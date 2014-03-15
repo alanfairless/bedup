@@ -432,6 +432,11 @@ class DedupSession(object):
     def open_by_inode(self, inode):
         try:
             pathb = inode.vol.live.lookup_one_path(inode)
+        except AttributeError as e:
+            print >>sys.stderr, "skipping inode %r" % (inode, )
+            self.sess.delete(inode)
+            yield None
+            return
         except IOError as e:
             if e.errno != errno.ENOENT:
                 raise
